@@ -78,13 +78,6 @@ export class SimpleP2PGame {
             localStorage.setItem("username", this.username);
         }
 
-        // setup the link area to copy to click board for the game link
-        document.getElementById("serverLink")!.addEventListener("click", (event) => {
-            this.copyLink();
-            event.stopPropagation();
-            event.preventDefault();
-        });
-
         // set up the username field on the screen with the ability for the player to click it and change their
         // username
         document.getElementById("username")!.innerHTML = "Username: " + this.username;
@@ -148,19 +141,6 @@ export class SimpleP2PGame {
             this.resourcesLoaded = true;
         };
         this.tileset.src = "src/tileset.png";
-    }
-
-    /**
-     * Copy the current server link if there is any
-     */
-    copyLink(): void {
-        if (this.link && this.link.length > 0) { 
-            navigator.clipboard.writeText(this.link);
-            document.getElementById("serverLink")!.innerHTML = "Copied Link!";
-            setTimeout(() => {
-                document.getElementById("serverLink")!.innerHTML = this.link;
-            }, 2000);
-        }
     }
 
     /**
