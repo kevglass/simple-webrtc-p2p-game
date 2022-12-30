@@ -11,10 +11,7 @@
       "strictNullChecks": true,
       "sourceMap": true,
       "baseUrl": ".",
-      "paths": {
-        "common/dist": ["../common/src"],
-        "gute/dist": ["../../gute/src"],
-      }
+      "paths": {}
     },
     "include": [
       "src/**/*"
@@ -23,5 +20,4 @@
       "node_modules",
       "**/__tests__/*"
     ]
-  }
-  
+}
