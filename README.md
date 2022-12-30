@@ -47,6 +47,39 @@ Basically 3 things can happen with candidates:
 
 Number 2 is why I think WebRTC data channels are a good fit for gaming. Most of the time peer to peer is going to work! :)
 
+## How the Networking Works
+
+This was more of an example of how P2P in WebRTC works than game networking. Theres a lot of discussion about the best ways to make things work, my opinion is that it depends on the game and good network comes from making your particular game "feel" right. Theres often a few domain specific cheats you can apply to make things better than networking. However, there are some great articles about possible networking approaches at:
+
+https://www.gabrielgambetta.com/client-server-game-architecture.html
+
+https://gafferongames.com/
+
+In this sample the actual game networking is simplified. We trust the client (something you should never do!). 
+
+1) Everyone connects to one of the browsers as a server (including the person who's running that browser)
+2) Client and Server run a model of the game - currently at 20 updates per second on both sides (this should be changed for client interpolation)
+3) Every update on the client it sends the player position and inputs state to the server. 
+4) When the server gets this update it applies this to it's copy of the model for that player.
+5) Every update on the server it sends out the position of all players to everyone connected
+6) When the client gets this update it applies this to its copy of the model with the exception it doesn't apply changes to its own player (since that will generally be ahead of the server)
+7) Every update on both model entities are moved based on their inputs. 
+
+In the perfect world with no latency and no packet loss everything just stays in sycn. Wonderful. However, since packets can be delayed or lost the updates may come in the wrong order or not arrive at all. To cope wit this:
+
+a) If any update arrives out of order, that it's sequence number (we apply to all updates) is lower than the latest one the client has had, it's thrown away (since it's no longer relevant)
+b) The game models carry on moving whether packets are received or not (client side prediction) - if someone keeps moving in a straight line then the client side prediction will keep things correct even if packets are lost. 
+
+### What should we really do?
+
+The answer is - it depends. The current model might work just fine for some games. However, if we wanted something a bit more robust:
+
+1) Send a series of snapshots of the game state in each packet, and play back a bit behind the latest one. This means that you're seeing everyone slightly delayed but it means you can deal wiht a certain amount of packet loss (dependent on how many snapshots you send and how much delay you have) without missing a frame.
+2) Update the local client from the servers snapshots and then apply the latest inputs against that. This means that the player will be perfectly in sync with the server apart from the bit of controls the server doesn't know about yet. This is nice from a prevent cheating point of view but can lead to players feeling like they have less control.
+3) Leave the client to do whatever it wants, but validate and force corrections from the server. If the player has warped farther than should be possible or has stood next to an explosion - get the server to send corrections and force the player into the right position. This works nicely for giving the player most naturual control but ends up with a large warping effect when corrections do need to take place.
+
+Maybe, with more time, I'll implement some of the above. However, I do have another different project that I spend my time on. If you found this article useful consider checking out my socket based MMORPG https://talesofyore.com
+
 ## Exercises for the reader
 
 - Add server validation of client inputs - This is dependent on your game, how do you know if an action the player took is valid?
