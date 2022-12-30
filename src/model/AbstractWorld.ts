@@ -6,6 +6,11 @@ export const LEFT: number = 1;
 export const RIGHT: number = 2;
 export const UP: number = 4;
 export const DOWN: number = 8;
+
+// it's important to pick the server and client updates as
+// values easily divisible with the current game model - otherwise
+// you'll introduce rounding errors (20 and 40 feel pretty good to me)
+
 // The number of updates per second the server uses
 export const SERVER_UPDATES_PER_SECOND: number = 20;
 // The number of updates per second the client uses
