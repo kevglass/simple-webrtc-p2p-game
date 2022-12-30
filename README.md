@@ -26,9 +26,9 @@ The following shows the setup procedure between server and client via the relay 
 
 Note that a player who is running the server is running both a Server and a Client. They are in fact connecting to their own server.
 
-Here's a sequence diagram of the setup. If you haven't seen one before read from top to bottom (time axis). 
+Here's a sequence diagram of the setup. If you haven't seen one before read from top to bottom (time axis):
 
-
+![image](https://user-images.githubusercontent.com/3787210/210059047-4b2005bd-6af0-4704-8a49-74bd888136cb.png)
 
 ## Exercises for the reader
 
