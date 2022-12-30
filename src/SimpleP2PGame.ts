@@ -13,8 +13,7 @@ declare let InstallTrigger: any;
 var isFirefox = typeof InstallTrigger !== 'undefined';
 
 // The scale up on the pixels - fixed at x2 scaling for now 
-const SCALE = 2;
-
+const SCALE = Util.isMobile() ? 1 : 2;
 
 /**
  * A very simple demo "game" to try out networking with WebRTC. This has been deliberately done without
@@ -436,8 +435,8 @@ export class SimpleP2PGame {
 
         if (this.resourcesLoaded) {
             // scale the canvas to fit the screen but keep our pixel scaling intact
-            this.canvas.width = Math.floor(window.innerWidth);
-            this.canvas.height = Math.floor(window.innerHeight);
+            this.canvas.width = Math.floor(window.innerWidth / SCALE);
+            this.canvas.height = Math.floor(window.innerHeight / SCALE);
 
             this.ctx.save();
 
