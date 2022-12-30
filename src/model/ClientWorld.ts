@@ -196,6 +196,8 @@ export class ClientWorld extends AbstractWorld {
                 // player since it'll be accurate based on local controls
                 this.moveEntities(this.getLocalEntity());
             }
+        } else {
+            this.localSequenceNumber = this.lastSequenceNumber;
         }
     }
 }
