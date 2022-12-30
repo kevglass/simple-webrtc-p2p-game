@@ -151,6 +151,12 @@ export class ServerWorld extends AbstractWorld {
         
         // tell the client which ID relates to their entity
         this.sendReliable(client, {
+            type: "time",
+            seq: this.sequenceNumber
+        });
+        
+        // tell the client which ID relates to their entity
+        this.sendReliable(client, {
             type: "identify",
             entityId: entity.id
         });

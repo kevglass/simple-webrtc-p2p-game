@@ -109,6 +109,9 @@ export class ClientWorld extends AbstractWorld {
         // name = tell me the name/label to apply to any entity
         } else if (message.type === "name") {
             this.nameById[message.entityId] = message.name;
+        } else if (message.type === "time") {
+            console.log("Start time set at: " + message.seq);
+            this.localSequenceNumber = message.seq;
         } else {
             console.log("Unrecognized message: " + text);
         }
@@ -131,11 +134,6 @@ export class ClientWorld extends AbstractWorld {
         }
         this.lastSequenceNumber = seq;
 
-        // if we haven't yet set our local sequence number then on the first packet we 
-        // get we'll say thats the point in time we're at
-        if (this.localSequenceNumber === 0) {
-            this.localSequenceNumber = seq;
-        }
         let index = 1;
         
         const entitiesInUpdate: Entity[] = [];
