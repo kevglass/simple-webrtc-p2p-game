@@ -149,38 +149,41 @@ export class ServerWorld extends AbstractWorld {
         // them
         const entity = new Entity(this.nextEntityId++, 100 + Math.floor(Math.random() * 100), 100 + Math.floor(Math.random() * 100), 1 + Math.floor(Math.random() * 8));
         
-        // tell the client which ID relates to their entity
-        this.sendReliable(client, {
-            type: "time",
-            seq: this.sequenceNumber
-        });
-        
-        // tell the client which ID relates to their entity
-        this.sendReliable(client, {
-            type: "identify",
-            entityId: entity.id
-        });
+        // give the channel half a second to start up for mobile support
+        setTimeout(() => {
+            // tell the client which ID relates to their entity
+            this.sendReliable(client, {
+                type: "time",
+                seq: this.sequenceNumber
+            });
+            
+            // tell the client which ID relates to their entity
+            this.sendReliable(client, {
+                type: "identify",
+                entityId: entity.id
+            });
 
-        // send everyone the new name and this new one all the existing names
-        this.sendAllReliable({
-            type: "name",
-            entityId: entity.id,
-            name: client.username
-        });
-
-        // send the new client the names associated with all entities so they have a full list
-        for (const other of this.server.clients) {
-            if (client !== other) {
-                const entity = this.clientToEntity[other.id];
-                if (entity) {
-                    this.sendReliable(client, {
-                        type: "name",
-                        entityId: entity.id,
-                        name: other.username
-                    });
+            // send the new client the names associated with all entities so they have a full list
+            for (const other of this.server.clients) {
+                if (client !== other) {
+                    const entity = this.clientToEntity[other.id];
+                    if (entity) {
+                        this.sendReliable(client, {
+                            type: "name",
+                            entityId: entity.id,
+                            name: other.username
+                        });
+                    }
                 }
             }
-        }
+
+            // send everyone the new name and this new one all the existing names
+            this.sendAllReliable({
+                type: "name",
+                entityId: entity.id,
+                name: client.username
+            });
+        }, 500);
 
         // store the entity in the model
         this.clientToEntity[client.id] = entity;
