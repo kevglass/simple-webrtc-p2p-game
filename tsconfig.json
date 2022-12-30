@@ -1,0 +1,27 @@
+{
+    "compilerOptions": {
+      "target": "es5",
+      "module": "commonjs",
+      "outDir": "./dist",
+      "strict": true,
+      "lib": ["dom"],
+      "esModuleInterop": true,
+      "resolveJsonModule": true,
+      "experimentalDecorators": true,
+      "strictNullChecks": true,
+      "sourceMap": true,
+      "baseUrl": ".",
+      "paths": {
+        "common/dist": ["../common/src"],
+        "gute/dist": ["../../gute/src"],
+      }
+    },
+    "include": [
+      "src/**/*"
+    ],
+    "exclude": [
+      "node_modules",
+      "**/__tests__/*"
+    ]
+  }
+  
