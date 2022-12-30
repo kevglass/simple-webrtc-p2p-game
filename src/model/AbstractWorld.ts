@@ -7,9 +7,11 @@ export const RIGHT: number = 2;
 export const UP: number = 4;
 export const DOWN: number = 8;
 // The number of updates per second the server uses
-export const UPDATES_PER_SECOND: number = 20;
+export const SERVER_UPDATES_PER_SECOND: number = 20;
+// The number of updates per second the client uses
+export const CLIENT_UPDATES_PER_SECOND: number = 40;
 // The amount the player moves each frame
-export const MOVE_SPEED: number = 6;
+export const MOVE_SPEED: number = 8;
 
 /**
  * The common elements between the server and client for maintaining the game world model. 
@@ -19,9 +21,12 @@ export abstract class AbstractWorld {
     entities: Entity[] = [];
     /** The map the game is taking place on */
     map: WorldMap;
+    /** The size of the step in a move entities call */
+    stepSize: number;
 
-    constructor(map: WorldMap) {
+    constructor(map: WorldMap, stepSize: number) {
         this.map = map;
+        this.stepSize = stepSize;
     }
 
     /**
@@ -29,24 +34,30 @@ export abstract class AbstractWorld {
      * move on the client at the same rate as they would on the server so things should
      * stay reasonably in sync.
      */
-    public moveEntities() {
+    public moveEntities(exclude?: Entity) {
         // move each entity (including the local one) based
         // on the inputs. Don't ever move an entity into a blocked (invalid)
         // position
+        const moveStep = MOVE_SPEED * this.stepSize;
+
         for (const entity of this.entities) {
+            if (entity === exclude) {
+                continue;
+            }
+
             let nx = entity.x;
             let ny = entity.y;
             if (entity.up) {
-                ny -= MOVE_SPEED;
+                ny -= moveStep;
             }
             if (entity.down) {
-                ny += MOVE_SPEED;
+                ny += moveStep;
             }
             if (entity.left) {
-                nx -= MOVE_SPEED;
+                nx -= moveStep;
             }
             if (entity.right) {
-                nx += MOVE_SPEED;
+                nx += moveStep;
             }
 
             // if the new position is to the right or left mark it 

@@ -55,6 +55,11 @@ export class WebChannel {
             });
         };
 
+        this.relayServer.onDisconnected = () => {
+            clientLog("Client Disconnected");
+            alert("Relay Server Disconnected, name may be in use");
+        }
+
         // callback for the relay server - we're going to process two types of 
         // message from the server - one that describes its capabilities in SDP called
         // the "offer" and one that gives us detail of one potential way of connecting

@@ -1,5 +1,5 @@
 import { WebChannel } from "src/transport/WebChannel";
-import { AbstractWorld, DOWN, LEFT, RIGHT, UP, UPDATES_PER_SECOND } from "./AbstractWorld";
+import { AbstractWorld, DOWN, LEFT, RIGHT, UP, SERVER_UPDATES_PER_SECOND, CLIENT_UPDATES_PER_SECOND } from "./AbstractWorld";
 import { Entity } from "./Entity";
 import { WorldMap } from "./WorldMap";
 
@@ -17,9 +17,11 @@ export class ClientWorld extends AbstractWorld {
     lastSequenceNumber: number = 0;
     /** The text label / name given to any given entity by the server */
     nameById: Record<number, string> = {};
+    /** The sequence number we think we're at with client side prediction */
+    localSequenceNumber: number = 0;
 
     constructor(client: WebChannel, map: WorldMap) {
-        super(map);
+        super(map, SERVER_UPDATES_PER_SECOND / CLIENT_UPDATES_PER_SECOND);
 
         this.client = client;
 
@@ -35,9 +37,17 @@ export class ClientWorld extends AbstractWorld {
         // then send the current state of any entity we own (currently only myId) 
         // to the server
         setInterval(() => {
-            this.moveEntities();
             this.sendState();
-        }, 1000 / UPDATES_PER_SECOND);
+        }, 1000 / SERVER_UPDATES_PER_SECOND);
+
+        setInterval(() => {
+            this.moveEntities();
+            // if we've identified our point in time then move it forward since
+            // we're predicting client movement
+            if (this.localSequenceNumber !== 0) {
+                this.localSequenceNumber += SERVER_UPDATES_PER_SECOND / CLIENT_UPDATES_PER_SECOND;
+            }
+        }, 1000 / CLIENT_UPDATES_PER_SECOND);
     }
 
     /**
@@ -120,6 +130,12 @@ export class ClientWorld extends AbstractWorld {
             return;
         }
         this.lastSequenceNumber = seq;
+
+        // if we haven't yet set our local sequence number then on the first packet we 
+        // get we'll say thats the point in time we're at
+        if (this.localSequenceNumber === 0) {
+            this.localSequenceNumber = seq;
+        }
         let index = 1;
         
         const entitiesInUpdate: Entity[] = [];
@@ -168,6 +184,19 @@ export class ClientWorld extends AbstractWorld {
         for (const entity of [...this.entities]) {
             if (!entitiesInUpdate.includes(entity)) {
                 this.entities.splice(this.entities.indexOf(entity), 1);
+            }
+        }
+
+        // finally adjust our current positions based on where they were
+        // at this sequence number and where we think we are in time
+        const step = SERVER_UPDATES_PER_SECOND / CLIENT_UPDATES_PER_SECOND;
+        const stepsAhead = Math.floor((this.localSequenceNumber - this.lastSequenceNumber) / step);
+        if (stepsAhead > 0) {
+            for (let i=0;i<stepsAhead;i++) {
+                // move all the entities from their server confirm positions to the point
+                // in time where client prediction thinks we are - apart from our local
+                // player since it'll be accurate based on local controls
+                this.moveEntities(this.getLocalEntity());
             }
         }
     }

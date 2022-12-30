@@ -1,5 +1,5 @@
 import { WebChannelServer, WebChannelClient } from "src/transport/WebChannelServer";
-import { AbstractWorld, DOWN, LEFT, RIGHT, UP, UPDATES_PER_SECOND } from "./AbstractWorld";
+import { AbstractWorld, DOWN, LEFT, RIGHT, UP, SERVER_UPDATES_PER_SECOND } from "./AbstractWorld";
 import { Entity } from "./Entity";
 import { WorldMap } from "./WorldMap";
 
@@ -23,7 +23,7 @@ export class ServerWorld extends AbstractWorld {
     private simulatedPacketLoss: number = 0.05;
 
     constructor(server: WebChannelServer, map: WorldMap, simulateNetworkDelayAndLoss: boolean = false) {
-        super(map);
+        super(map, 1);
 
         this.server = server;
         this.simulateNetworkDelayAndLoss = simulateNetworkDelayAndLoss;
@@ -74,7 +74,7 @@ export class ServerWorld extends AbstractWorld {
 
             // finally move the entities based on the current state
             this.moveEntities();
-        }, 1000 / UPDATES_PER_SECOND);
+        }, 1000 / SERVER_UPDATES_PER_SECOND);
     }
 
     sendToAll(buffer: Uint16Array): void {
