@@ -6,6 +6,7 @@ import { WebChannel } from "./transport/WebChannel";
 import { WebChannelServer } from "./transport/WebChannelServer";
 import { WSRelayServer } from "./transport/WSRelayServer";
 import { Util } from "./Util";
+import tileset from "./assets/tileset.png";
 
 // Quick check for firefox since rendering there needs to have different
 // css option to make pixelated scaling of sprites
@@ -140,7 +141,7 @@ export class SimpleP2PGame {
         this.tileset.onload = () => {
             this.resourcesLoaded = true;
         };
-        this.tileset.src = "src/tileset.png";
+        this.tileset.src = tileset;
     }
 
     /**
