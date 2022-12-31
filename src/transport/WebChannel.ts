@@ -142,6 +142,7 @@ export class WebChannel {
         // so we can be notified of open/close and messages
         // received
         this.orderedChannel = event.channel;
+        this.orderedChannel.binaryType = "arraybuffer";
         clientLog("Received data channel setup from (ordered) : " + this.target);
 
         this.orderedChannel.onmessage = (event) => {
@@ -161,6 +162,7 @@ export class WebChannel {
         // so we can be notified of open/close and messages
         // received
         this.unorderedChannel = event.channel;
+        this.unorderedChannel.binaryType = "arraybuffer";
         clientLog("Received data channel setup from (unordered) : " + this.target);
 
         this.unorderedChannel.onmessage = (event) => {

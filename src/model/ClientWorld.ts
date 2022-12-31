@@ -124,17 +124,21 @@ export class ClientWorld extends AbstractWorld {
      * @param buffer The buffer of binary encoded data for the state update
      */
     handleState(buffer: ArrayBuffer): void {
+        console.log("Got state: " + this.myId);
         const state = new Uint16Array(buffer);
-        const seq = state[0];
+        console.log(state.length);
+        // four byte sequence number
+        const seq = state[0] | ((state[1] << 16) & 0xFFFF0000);
 
         // check if this sequence number is old - note that the sequence number will
         // overflow and loop so more than 10000 older is probably a loop
-        if ((seq <= this.lastSequenceNumber) && (this.lastSequenceNumber - seq < 10000)) {
+        
+        if (seq <= this.lastSequenceNumber) {
             return;
         }
         this.lastSequenceNumber = seq;
 
-        let index = 1;
+        let index = 2;
         
         const entitiesInUpdate: Entity[] = [];
 
@@ -188,7 +192,8 @@ export class ClientWorld extends AbstractWorld {
         // finally adjust our current positions based on where they were
         // at this sequence number and where we think we are in time
         const step = SERVER_UPDATES_PER_SECOND / CLIENT_UPDATES_PER_SECOND;
-        const stepsAhead = Math.floor((this.localSequenceNumber - this.lastSequenceNumber) / step);
+        let stepsAhead = Math.floor((this.localSequenceNumber - this.lastSequenceNumber) / step);
+
         if (stepsAhead > 0) {
             for (let i=0;i<stepsAhead;i++) {
                 // move all the entities from their server confirm positions to the point

@@ -15,12 +15,14 @@ export class ServerWorld extends AbstractWorld {
     /** Mapping from the client ID to the entity it controls */
     clientToEntity: Record<number, Entity> = {};
     /** The next sequence number we'll use when sending an update */
-    sequenceNumber: number = 0;
+    sequenceNumber: number = 1;
 
-    /** Indicates whether we're going to simulate network issues - on the localhost we simulate 500ms max delay and 5% packet loss to keep us honest */
+    /** Indicates whether we're going to simulate network issues - on the localhost we simulate 100ms max delay and 5% packet loss to keep us honest */
     private simulateNetworkDelayAndLoss: boolean = true;
     /** The amount of packet loss to simulate */
     private simulatedPacketLoss: number = 0.05;
+    /** The maximum random delay applied */
+    private simulatedMaxDelay: number = 100;
 
     constructor(server: WebChannelServer, map: WorldMap, simulateNetworkDelayAndLoss: boolean = false) {
         super(map, 1);
@@ -30,7 +32,7 @@ export class ServerWorld extends AbstractWorld {
         
         if (simulateNetworkDelayAndLoss) {
             console.log("Simulating Network Delay and Loss");
-            console.log("  Max Delay: " + this.server.maxPacketLifeTime + "ms");
+            console.log("  Max Delay: " + this.simulatedMaxDelay + "ms");
             console.log("  Packet Loss: " + (this.simulatedPacketLoss * 100)+"%");
         }
         this.server.onConnect = (client: WebChannelClient) => {
@@ -50,16 +52,13 @@ export class ServerWorld extends AbstractWorld {
             // increase out sequence number for this update and manually
             // overflow it since we're sticking it in a 16 unsigned int
             this.sequenceNumber++;
-            if (this.sequenceNumber > 50000) {
-                this.sequenceNumber = 0;
-            }
 
             // If we're simulating network issues when we either drop the packet (packet loss)
             // or we randomize the delay the packet has. This is similar to what will happen on 
             // a poor network
             if (this.simulateNetworkDelayAndLoss) {
                 if (Math.random() > this.simulatedPacketLoss) {
-                    const delay = Math.floor(Math.random() * (this.server.maxPacketLifeTime / 2));
+                    const delay = Math.floor(Math.random() * this.simulatedMaxDelay);
 
                     // we have to record the sequence number here or when the timeout 
                     // fires we'll send whatever the current sequence number is
@@ -95,7 +94,10 @@ export class ServerWorld extends AbstractWorld {
      */
     createState(sequence: number): Uint16Array {
         const data: number[] = [];
-        data.push(sequence);
+        // four byte sequence number
+        data.push(sequence & 0xFFFF);
+        data.push((sequence >> 16) & 0x0000FFFF);
+
         for (const entity of this.entities) {
             // encode the entity 
             data.push(entity.id);

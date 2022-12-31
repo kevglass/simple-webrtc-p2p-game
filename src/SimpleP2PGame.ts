@@ -516,6 +516,13 @@ export class SimpleP2PGame {
             }
         }
 
+        // debug to show the sequence number received from the server
+        // if (this.clientWorld) {
+        //     this.ctx.fillStyle = "white";
+        //     this.ctx.font = "10px Arial";
+        //     this.ctx.fillText("SEQ: " + this.clientWorld.lastSequenceNumber, 10, 20);
+        // }
+
         // request the next frame
         requestAnimationFrame(() => { this.render() });
     }

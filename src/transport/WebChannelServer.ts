@@ -54,6 +54,7 @@ export class WebChannelClient {
         this.orderedChannel = this.localConnection.createDataChannel("ordered", {
             ordered: true
         });
+        this.orderedChannel.binaryType = "arraybuffer";
         this.orderedChannel.onmessage = (event) => {
             this.handleOrderedReceiveMessage(event);
         }
@@ -77,6 +78,7 @@ export class WebChannelClient {
         this.unorderedChannel.onclose= (event) => {
             this.handleUnorderedStatusChange(event);
         };
+        this.unorderedChannel.binaryType = "arraybuffer";
 
         this.localConnection.createOffer().then((offer) => {
             // once the local side has made up its description, tell the 
