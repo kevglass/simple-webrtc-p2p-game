@@ -12,7 +12,7 @@ export class WSRelayServer implements RelayServer {
     /** The web socket we're using to talk to the relay server */
     private socket?: Socket;
     /** The address of the relay server - this is using my free AWS one */
-    host: string = "relayserver-env.eba-2kmhisfa.us-west-2.elasticbeanstalk.com";
+    host: string = "https://node4.cokeandcode.com";
     /** The username we're presenting to the relay server */
     username: string;
     /** True if we're connected */
