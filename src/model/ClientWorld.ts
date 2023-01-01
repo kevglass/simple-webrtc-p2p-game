@@ -124,9 +124,7 @@ export class ClientWorld extends AbstractWorld {
      * @param buffer The buffer of binary encoded data for the state update
      */
     handleState(buffer: ArrayBuffer): void {
-        console.log("Got state: " + this.myId);
         const state = new Uint16Array(buffer);
-        console.log(state.length);
         // four byte sequence number
         const seq = state[0] | ((state[1] << 16) & 0xFFFF0000);
 
